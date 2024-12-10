@@ -1,0 +1,223 @@
+Introduction 
+The emergence of foundation models and generative AI (gen AI) has introduced a new era  for building AI systems. Selecting the right model from a diverse range of architectures  and sizes, curating data, engineering optimal prompts, tuning models for specific tasks,  grounding model outputs in real-world data, optimizing hardware - these are just a few of the  novel challenges that large models introduce.  
+This whitepaper delves into the fundamental tenets of MLOps and the necessary adaptations  required for the domain of gen AI and Foundation Models. We also examine the diverse range  of Vertex AI products, specifically tailored to address the unique demands of foundation  models and gen AI-based applications. Through this exploration we uncover how Vertex AI,  with its solid foundations of AI infrastructure and MLOps tools, expands its capabilities to  provide a comprehensive MLOps platform for gen AI. 
+September 2024 5 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+What are DevOps and MLOps? 
+DevOps is a software engineering methodology that aims to bridge the gap between  development (Dev) and operations (Ops). It promotes collaboration, automation, and  continuous improvement to streamline the software development lifecycle, introducing  practices such as continuous integration and continuous delivery.  
+MLOps builds upon DevOps principles to address the unique challenges of operationalizing  Machine Learning systems rapidly and reliably. In particular, MLOps tackles the experimental  nature of ML through practices like: 
+• Data validation: Ensuring the quality and integrity of training data. 
+• Model evaluation: Rigorously assessing model performance with appropriate metrics. • Model monitoring: Tracking model behavior in production to detect and mitigate drift. 
+• Tracking & reproducibility: Maintaining meticulous records for experiment tracking and  result reproduction. 
+
+Figure 1. Machine learning workflow 
+September 2024 6 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Lifecycle of a gen AI system 
+Imagine deploying your first chatbot after months of dedicated work, and it's now interacting  with users and answering questions. Behind this seemingly simple interaction lies the  complex and fascinating life cycle of a gen AI System, which can be broken down into five  key moments. 
+First in the discovery phase, developers and AI engineers must navigate the expanding  landscape of available models to identify the most suitable one for their specific gen AI  application. They must consider each model's strengths, weaknesses, and costs to make an  informed decision. 
+Next, development and experimentation become paramount, with prompt engineering  playing a crucial role in crafting and refining input prompts to elicit desired outputs based on  an understanding of the model's intricacies. Few-shot learning, where examples are provided,  can further guide model behavior, while additional customization may involve parameter efficient fine-tuning (PEFT). Most gen AI systems also involve model chaining, which refers to  orchestrating calls to multiple models in a specific sequence to create a workflow. 
+Data engineering practices have a critical role across all development stages, with factual  grounding (ensuring the model's outputs are based on accurate, up-to-date information) and  recent data from internal and enterprise systems being essential for reliable outputs. Tuning  data is often needed to adapt models to specific tasks, styles, or to rectify persistent errors. 
+Deployment needs to manage many new artifacts in the deployment process, including  prompt templates, chain definitions, embedding models, retrieval data stores, and fine-tuned  model adapters among others. These artifacts each have unique governance requirements,  necessitating careful management throughout development and deployment. Gen AI system  deployment also needs to account for the technical capabilities of the target infrastructure,  ensuring that system hardware requirements are fulfilled.
+September 2024 7 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Continuous monitoring in production ensures improved application performance and  maintains safety standards through responsible AI techniques, such as ensuring fairness,  transparency, and accountability in the model's outputs. 
+Continuous Improvement as a concept is still key for Gen AI-based applications, though  with a twist. For most Gen AI applications, instead of training models from scratch, we’re  taking foundation models (FMs) and then adapting them to our specific use case. This means  constantly tweaking these FMs through prompting techniques, swapping them out for newer  versions, or even combining multiple models for enhanced performance, cost efficiency, or  reduced latency. Traditional continuous training still holds relevance for scenarios when  recurrent fine-tuning or incorporating human feedback loops are still needed. 
+Naturally, this lifecycle assumes that the foundational model powering the gen AI system is  already operationalized. It's important to recognize that not all organizations will be directly  involved in this part of the process. In particular, the operationalization of foundational  models is a specialized set of tasks that is typically only relevant for a select few companies  with the necessary resources and expertise. 
+Because of that, this whitepaper will focus on practices required to operationalize gen AI  applications using and adapting existing foundation models, referring to other whitepapers in  the book should you want to deepdive into how foundational models are operationalized.  
+This includes active areas of research such as model pre-training, alignment (ensuring the  model's outputs align with the desired goals and values), evaluation or serving.
+September 2024 8 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+
+Figure 2. Lifecycle of a Foundational Model & gen AI system and relative operationalization practices  
+Discover 
+As mentioned before, building foundational models from scratch is resource-intensive.  Training costs and data requirements are substantial, pushing most practitioners towards  adapting existing foundation models through techniques like fine-tuning and prompt  engineering. This shift highlights a crucial need: efficiently discovering the optimal foundation  model for a given use case. 
+These two characteristics of the gen AI landscape make model discovery an essential  MLOps practice: 
+1. An abundance of models: The past year has witnessed an explosion of open-source  and proprietary foundation models. Navigating this complex landscape, each with varying  architectures, sizes, training datasets, and licenses, requires a systematic approach to  identify suitable candidates for further evaluation.
+September 2024 9 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+2. No one-size-fits-all solution: Each use case presents unique requirements, demanding a  nuanced analysis of available models across multiple dimensions. 
+Here are some factors to consider when exploring models: 
+1. Quality: Early assessments can involve running test prompts or analyzing public  benchmarks and metrics to gauge output quality. 
+2. Latency & throughput: These factors directly impact user experience. A chatbot  demands lower latency than batch-processed summarization tasks. 
+3. Development & maintenance time: Consider the time investment for both initial  development and ongoing maintenance. Managed models often require less effort than  self-deployed open-source alternatives. 
+4. Usage cost: Factor in infrastructure and consumption costs associated with using the  chosen model. 
+5. Compliance: Assess the model's ability to adhere to relevant regulations and  licensing terms. 
+Because the activity of discovery has become so important for gen AI systems, many model  discoverability platforms were created to support this need. An example of that is Vertex  Model Garden,1 which is explored later in this whitepaper. 
+Develop and experiment 
+The process of development and experimentation remains iterative and orchestrated  while building gen AI applications. Each experimental iteration involves a tripartite  interplay between data refinement, foundation model(s) selection and adaptation, and 
+September 2024 10 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+rigorous evaluation. Evaluation provides crucial feedback, guiding subsequent iterations  in a continuous feedback loop. Subpar performance might call for gathering more data,  augmenting data, or further curating the data. Similarly, the adaptation of the foundation  model itself might need tweaking - optimizing prompts, applying fine-tuning techniques, or  even swapping it out for a different one altogether. This iterative refinement cycle, driven by  evaluation insights, is just as critical for optimizing gen AI applications as it’s always been for  traditional machine learning. 
+The foundational model paradigm 
+Foundation models differ from predictive models most importantly because they are multi purpose models. Instead of being trained for a single purpose, on data specific to that  task, foundation models are trained on broad datasets, and therefore can be applied to  many different use cases. This distinction brings with it several more important differences  between foundation models and predictive models. 
+Foundation models also exhibit what are known as ‘emergent properties’,2 capabilities that  emerge in response to specific input without additional training. Predictive models are  only able to perform the single function they were trained for; a traditional French-English  translation model, for instance, cannot also solve math problems. 
+Foundation models are also highly sensitive to changes in their input. The output of the  model and the task it performs are strongly affected, indeed determined, by the input to the  model. A foundation model can be made to perform translation, generation, or classification  tasks simply by changing the input. Even insignificant changes to the input can affect its  ability to correctly perform that task.
+September 2024 11 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+These new properties of foundation models have created a corresponding paradigm shift  in the practices required to develop and operationalize Gen AI systems. While models in  the predictive AI context are self-sufficient and task-specific, gen AI models are multi purpose and need an additional element beyond the user input to function as part of a  gen AI Application: a prompt, and more specifically, a prompt template, defined as a set of  instructions and examples along with placeholders to accommodate user input. A prompt  template, along with dynamic data such as user input, can be combined to create a complete  prompt, the text that is passed as input to the foundation model. 
+Figure 3. How Prompt Template and User input can be combined to create a prompt
+September 2024 12 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+The core component of LLM Systems: A prompted  model component 
+The presence of the prompt element is a distinguishing feature of gen AI applications.  Neither the model nor the prompt is sufficient for the generation of content; gen AI needs the  combination of both. We refer to the combination as a ‘prompted model component’. This  is the smallest independent component sufficient to create an LLM application. The prompt  does not need to be very complicated. It can be a simple instruction, such as “translate  the following sentence from English to French“, followed by the sentence to be translated.  Without that preliminary instruction, though, a foundation model would not perform the  desired translation task. So a prompt, even just a basic instruction, is necessary along with  the input to get the foundation model to do the task required by the application. 
+Figure 4. Predictive AI unit compared with the gen AI unit 
+This introduces an important distinction when it comes to MLOps practices for gen AI. In  the development of a gen AI System, experimentation and iteration need to be done in the  context of a prompted model component, the combination of a model and a prompt. The Gen 
+September 2024 13 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+AI experimentation cycle typically begins with testing variations of the prompt – changing the  wording of the instructions, providing additional context, or including relevant examples, etc.,  and evaluating the impact of those changes. This practice is commonly referred to as prompt  engineering.  
+Prompt engineering involves two iterative steps: 
+1. Prompting: Crafting and refining prompts to elicit desired behaviors from a foundational  model for a specific use case. 
+2. Evaluation: Assessing the model's outputs, ideally programmatically, to gauge its  understanding and success in fulfilling the prompt's instructions. 
+Figure 5. The activity of prompt engineering 
+Results of an evaluation can be optionally registered as part of an experiment, to allow for  result tracking. Since the prompt itself is a core element of the prompt engineering process,  it becomes a first class citizen within the artifacts part of the experiment.  
+However, we need to identify which type of artifacts they are. In the good old days of  Predictive AI, we had clear lines - data was one thing, pipelines and code another. But with  the “Prompt” paradigm in gen AI, those lines get blurry. Think about it: prompts can include  anything from context, instructions, examples, guardrails to actual internal or external data  pulled from somewhere else. So, are prompts data? Are they code?
+September 2024 14 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+To address these questions, a hybrid approach is needed, recognizing that a prompt has  different components and requires different management strategies. Let’s break it down: 
+Prompt as Data: Some parts of the prompt will act just like data. Elements like few-shot  examples, knowledge bases, and user queries are essentially data points. For these  components, we need data-centric MLOps practices such as data validation, drift detection,  and lifecycle management. 
+Prompt as Code: Other components such as context, prompt templates, guardrails are mode  code-like. They define the structure and rules of the prompt itself. Here, we need code centric practices such as approval processes, code versioning, and testing. 
+As a result, when applying MLOps practices to gen AI, it becomes important to have in place  processes that give developers easy storage, retrieval, tracking, and modification of prompts.  This allows for fast iteration and principled experimentation. Often one version of a prompt  will work well with a specific version of the model and less well with a different version. In  tracking the results of an experiment, both the prompt and its components version, and the  model version must be recorded and stored along with metrics and output data produced by  the prompted model. 
+The fact that development and experimentation in gen AI requires working with the prompt  and the model together introduces changes in some of the common MLOps practices,  compared to the predictive AI case in which experimentation is done by changing the model  alone. Specifically, several of the MLOps practices need to be expanded to consider the  prompted model component together as a unit. This includes practices like evaluation,  experiment tracking, model adaptation and deployment, and artifact management,  which will be discussed below in this whitepaper. 
+September 2024 15 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Chain & Augment 
+Gen AI models, particularly large language models (LLMs), face inherent challenges in  maintaining recency and avoiding hallucinations. Encoding new information into LLMs  requires expensive and data-intensive pre-training, posing a significant hurdle. Additionally,  LLMs might be unable to solve complex challenges, especially when step-by-step reasoning  is required. Depending on the use case, leveraging only one prompted model to perform  a particular generation might not be sufficient. To solve this issue, leveraging a divide and  conquer approach, several prompted models can be connected together, along with calls  to external APIs and logic expressed as code. A sequence of prompted model components  connected together in this way is commonly known as a chain.  
+Figure 6. Components of a chain and relative development process
+September 2024 16 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Two common chain-based patterns that have emerged to mitigate recency and  hallucinations are retrieval augmented generation (RAG)3 and Agents.  
+• RAG addresses these challenges by augmenting pre-trained models with  “knowledge” retrieved from databases, bypassing the need for pre-training. This  enables grounding and reduces hallucinations by incorporating up-to-date factual  information directly into the generation process.  
+• Agents, popularized by the ReAct prompting technique,4 leverage LLMs as mediators  interacting with various tools, including RAG systems, internal or external APIs,  custom extensions, or even with other agents. This enables complex queries and  real-time actions by dynamically selecting and utilizing relevant information sources.  The LLM, acting as an agent, interprets the user’s query, decides which tool to utilize,  and how to formulate the response based on the retrieved information. 
+RAG and Agents approaches can be combined to create multi-agent systems connected  to large information networks, enabling sophisticated query handling and real-time  decision-making.  
+The orchestration of different models, logic and APIs is not a novelty of gen AI  Applications. For example, recommendation engines have long combined collaborative  filtering models, content-based models, and business rules to generate personalized  product recommendations for users. Similarly, in fraud detection, machine learning  models are integrated with rule-based systems and external data sources to identify  suspicious activities.
+September 2024 17 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+What makes these chains of gen AI components different, is that, we can't a priori  characterize or cover the distribution of component inputs, which makes the individual  components much harder to evaluate and maintain in isolation. 
+This results in a paradigm shift in how AI applications are being developed for gen AI. 
+Unlike Predictive AI where it is often possible to iterate on the separate models and  components in isolation to then chain in the AI application, in gen AI it’s often easier to  develop a chain in integration, performing experimentation on the chain end-to-end, iterating  over chaining strategies, prompts, the underlying foundational models and other APIs in  a coordinated manner to achieve a specific goal. No feature engineering, data collection,  or further model training cycles is often needed; just changes to the wording of the  prompt template. 
+The shift towards MLOps for gen AI, in contrast to predictive AI, brings forth a new set of  demands. Let's break down these key differences: 
+1. Evaluation: Because of their tight coupling, chains need end-to-end evaluation, not just  on a per-component basis, to gauge their overall performance and the quality of their  output. In terms of evaluation techniques and metrics, evaluating chains is not dissimilar  to evaluating prompted models. Please refer to the below segment on evaluation for more  details on these approaches. 
+2. Versioning: A chain needs to be managed as a complete artifact in its entirety. The chain  configuration should be tracked with its own revision history for analysis, reproducibility,  and understanding the impact of changes on output. Logging should also include the  inputs, outputs, and intermediate states of the chain, and any chain configurations used  during each execution.
+September 2024 18 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+3. Continuous Monitoring: Establishing proactive monitoring systems is vital for detecting  performance degradation, data drift, or unexpected behavior in the chain. This ensures  early identification of potential issues to maintain the quality of the generated output. The  activity of monitoring Chains is discussed in detail in the section ‘Logging and Monitoring’.  
+4. Introspection: The ability to inspect the internal data flows of a chain (inputs and outputs  from each component) as well as the inputs and outputs of the entire chain is paramount.  By providing visibility into the data flowing through the chain and the resulting content,  developers can pinpoint the sources of errors, biases, or undesirable behavior. 
+Figure 7. Putting together chains, prompted models and model tuning 
+There are several products in Vertex AI that can support the need for chaining and  augmentation, including Grounding as a service,5 Extensions,6 and Vector Search,7 Agent  Builder.8 We discuss the products in the section “Role of a AI Platform”. Langchain9 is also  integrated with the Vertex SDK,10 and can be used alongside the core Vertex products to  define and configure gen AI chained applications.
+September 2024 19 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Tuning & training 
+When developing a gen AI use case and a specific task that involves LLMs, it can be difficult,  especially for complex tasks, to rely on only prompt engineering and chaining to solve it.  To improve task performance practitioners often also need to fine-tune the model directly.  Fine-tuning lets you actively change the layers or a subset of layers of the LLM to optimize  the capability of the model to perform a certain task. Two of the most common ways of  tuning a model are: 
+1. Supervised fine-tuning: This is where we train the model in a supervised manner, teaching  it to predict the right output sequence for a given input.  
+2. Reinforcement Learning from Human Feedback (RLHF): In this approach, we first train  a reward model to predict what humans would prefer as a response. Then, we use this  reward model to nudge the LLM in the right direction during the tuning process. Like  having a panel of human judges guiding the model's learning.  
+Figure 8. Putting together chains, prompted models and model tuning
+September 2024 20 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+When viewed through the MLOps lens, fine-tuning shares similar requirements with  model training: 
+1. The capability to track artifacts being part of the tuning job. This includes for example the  input data or the parameters being used to tune the model. 
+2. The capability to measure the impact of the tuning. This translates into the capability  to perform evaluation of the tuned model for the specific tasks it was trained on and to  compare results with previously tuned models or frozen models for the same task. 
+Platforms like Vertex AI11 (and the Google Cloud platform more broadly) provide a robust  suite of services designed to address these MLOps requirements: Vertex Model Registry,12 for instance, provides a centralized storage location for all the artifacts created during the  tuning job, and Vertex Pipelines13 streamlines the development and management of these  tuning jobs. Dataplex,14 meanwhile, provides an organization-wide data fabric for data lineage  and governance and integrates well with both Vertex AI and BigQuery.15 What’s more, these  products provide the same governance capability for both predictive and gen AI applications,  meaning customers do not need separate products or configurations to manage generative  versus AI development. 
+Continuous Training & Tuning 
+In machine learning operations (MLOps), continuous training is the practice of repeatedly  retraining machine learning models in a production environment. This is done to ensure  that the model remains up-to-date and performs well as real-world data patterns change  over time. For gen AI models, continuous tuning of the models is often more practical than  retraining from scratch due to the high data and computational costs involved. 
+September 2024 21 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+The approach to continuous tuning depends on the specific use case and goals. For relatively  static tasks like text summarization, the continuous tuning requirements may be lower. But  for dynamic applications like chatbots that need constant human alignment, more frequent  tuning using techniques like RLHF based on human feedback is necessary.  
+To determine the right continuous tuning strategy, AI practitioners must carefully evaluate  the nature of their use case and how the input data evolves over time. Cost is also a major  consideration, as the compute infrastructure greatly impacts the speed and expense of  tuning. We discuss in detail monitoring of GenAI systems in the Logging and Monitoring  section of this whitepaper. 
+Graphics processing units (GPUs) and tensor processing units (TPUs) are key hardware for  fine-tuning. GPUs, known for their parallel processing power, are highly effective in handling  the computationally intensive workloads and often associated with training and running  complex machine learning models. TPUs, on the other hand, are specifically designed  by Google for accelerating machine learning tasks. TPUs excel in handling large matrix  operations common in deep learning neural networks. 
+To manage costs, techniques like model quantization can be applied. This represents model  weights and activations using lower-precision 8-bit integers rather than 32-bit floats, which  reduces computational and memory requirements. 
+We discuss in detail the support for tuning in Vertex AI in the Customize: Vertex AI Training &  Tuning section.
+September 2024 22 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Data Practices 
+Traditionally, ML model behavior was dictated solely by its training data. While this still holds  true for foundation models – trained on massive, multilingual, multimodal datasets – gen AI  applications built on top of them introduce a new twist: model behavior is now determined by  how you adapt the model using different types of input data (Figure. 9). 
+Figure 9. Examples of data spectrum for foundation models – creation (left) vs. adaptation (right) 
+The key difference between traditional predictive ML and gen AI lies in where you start. In  predictive ML, the data is paramount. You spend a lot of time on data engineering, and if you  don’t have the right data, you cannot build an application. Gen AI takes a unique approach to  this matter. You start with a foundation model, some instructions and maybe a few example  inputs (in-context learning). You can prototype and launch an application with surprisingly  little data. 
+September 2024 23 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+This ease of prototyping, however, comes with a challenge. Traditional predictive AI relies on  apriori well-defined dataset(s). In gen AI, a single application can leverage various data types,  from completely different data sources, all working together (Figure 10). Let’s explore some  of these data types: 
+• Conditioning prompts: These are essentially instructions given to the Foundation Model  (FM) to guide its output, setting boundaries of what it can generate. 
+• Few-shot examples: A way to show the model what you want to achieve through input output pairs. This helps the model grasp the specific task(s) at hand, and in many cases, it  boosts performances. 
+• Grounding/augmentation data: Data coming from either external APIs (like Google  Search) or internal APIs and data sources. This data permits the FM to produce answers  for a specific context, keeping responses current, relevant without retraining the entire  FM. This type of data also supports reducing hallucinations. 
+• Task-specific datasets: These are used to fine-tune an existing FM for a particular task,  improving its performance in that specific area. 
+• Human preference datasets: These capture feedback on generated outputs, helping  refine the model’s ability to produce outputs that align with human preferences.  
+• Full pre training corpora: These are massive datasets used to initially train foundation  models. While application builders may not have access to them nor the tokenizers,  the information encoded in the model itself will influence the application’s output  and performance. 
+This is not an exhaustive list. The variety of data used in gen AI applications is constantly  growing and evolving.
+September 2024 24 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+
+Figure 10. Example of high-level data and adaptations landscape for developing gen AI applications using  existing foundation models 
+This diverse range of data adds another complexity layer in terms of data organization,  tracking and lifecycle management. Take a RAG-based application as an example: it might  involve rewriting user queries, dynamically gathering relevant examples using a curated set  of examples, querying a vector database, and combining it all with a prompt template. This  involves managing multiple data types: user queries, vector databases with curated few-shot  examples and company information, and prompt templates.
+September 2024 25 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Each data type needs careful organization and maintenance. For example, the vector  database requires processing data into embeddings, optimizing chunking strategies, and  ensuring only relevant information is available. The prompt template itself needs versioning  and tracking, the user queries need rewriting, etc. This is where traditional MLOps and  DevOps best practices come into play, with a twist. We need to ensure reproducibility,  adaptability, governance, and continuous improvement using all the data required in an  application as a whole but also individually. Think of it this way: in predictive AI, the focus  was on well-defined data pipelines for extraction, transformation, and loading. In gen AI,  it's about building pipelines to manage, evolve, adapt and integrate different data types in a  versionable, trackable, and reproducible way.  
+As mentioned earlier, fine-tuning foundation models (FMs) can boost gen AI app  performance, but it needs data. You can get this data by launching your app and gathering  real-world data, generating synthetic data, or a mix of both. Using large models to generate  synthetic data is becoming popular because it speeds things up, but it's still good to have a  human check the results for quality assurance. Here are few ways to leverage large models  for data engineering purposes: 
+1. Synthetic data generation: This process involves creating artificial data that closely  resembles real-world data in terms of its characteristics and statistical properties, often  being done with a large and capable model. This synthetic data serves as additional  training data for gen AI, enabling it to learn patterns and relationships even when labeled  real-world data is scarce. 
+2. Synthetic data correction: This technique focuses on identifying and correcting errors  and inconsistencies within existing labeled datasets. By leveraging the power of larger  models, gen AI can flag potential labeling mistakes and propose corrections, improving the  quality and reliability of the training data.
+September 2024 26 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+3. Synthetic data augmentation: This approach goes beyond simply generating new  data. It involves intelligently manipulating existing data to create diverse variations while  preserving essential features and relationships. Thus, gen AI can encounter a broader  range of scenarios during training, leading to improved generalization and ability to  generate nuanced and relevant outputs. 
+Evaluating gen AI, unlike predictive AI, is tricky. You don't usually know the training data  distribution of the foundational models. Building a custom evaluation dataset reflecting your  use case is essential. This dataset should cover essential, average, and edge cases. Similar  to fine-tuning data, you can leverage powerful language models to generate, curate, and  augment data for building robust evaluation datasets. 
+Evaluate 
+Even if only prompt engineering is performed, as any experimental process, it does require  evaluation in order to iterate and improve. This makes the evaluation process a core activity  of the development of any gen AI systems. 
+In the context of gen AI systems, evaluation might have different degrees of automation: from  entirely driven by humans to entirely automated by a process.  
+In the early days of a project, when you're still prototyping, evaluation is often a manual  process. Developers eyeball the model's outputs, getting a qualitative sense of how it's  performing. But as the project matures and the number of test cases balloons, manual  evaluation becomes a bottleneck. That's when automation becomes key.
+September 2024 27 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Automating evaluation has two big benefits. First, it lets you move faster. Instead of spending  time manually checking each test case, you can let the machines do the heavy lifting.  This means more iterations, more experiments, and ultimately, a better product. Second,  automation makes evaluation more reliable. It takes human subjectivity out of the equation,  ensuring that results are reproducible. 
+But automating evaluation for gen AI comes with its own set of challenges.  
+For one, both the inputs (prompts) and outputs can be incredibly complex. A single prompt  might include multiple instructions and constraints that the model needs to juggle. And the  outputs themselves are often high-dimensional - think a generated image or a block of text.  Capturing the quality of these outputs in a simple metric is tough. 
+There are some established metrics, like BLEU for translations and ROUGE for summaries,  but they don't always tell the full story. That's where custom evaluation methods come in.  One approach is to use another foundational model as a judge. For example, you could  prompt a large language model to score the quality of generated texts across various  dimensions. This is the idea behind techniques like AutoSxS.16 
+Another challenge is the subjective nature of many evaluation metrics for gen AI. What  makes one output ‘better’ than another can often be a matter of opinion. The key here is to  make sure your automated evaluation aligns with human judgment. You want your metrics  to be a reliable proxy for what people would think. And to ensure comparability between  experiments, it's crucial to lock down your evaluation approach and metrics early in the  development process. 
+Lack of ground truth data is another common hurdle, especially in the early stages of a  project. One workaround is to generate synthetic data to serve as a temporary ground truth,  which can be refined over time with human feedback.
+September 2024 28 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Finally, comprehensive evaluation is essential for safeguarding gen AI applications against  adversarial attacks. Malicious actors can craft prompts to try to extract sensitive information  or manipulate the model's outputs. Evaluation sets need to specifically address these attack  vectors, through techniques like prompt fuzzing (feeding the model random variations on  prompts) and testing for information leakage. 
+Automating the evaluation process ensures speed, scalability and reproducibility 
+An automation of the evaluation process can be considered a proxy for the  human judgmen 
+Depending on the use case, the evaluation process will require a high degree  of customization. 
+To ensure comparability it is essential to stabilize the evaluation approach, metrics,  and ground truth data as early as possible in the development phase. 
+It is possible to generate synthetic ground truth data to accommodate for the lack of  real ground truth data. 
+It is important to include test cases of adversarial prompting as part of the evaluation  set to test the reliability of the system itself for these attacks. 
+Table 1. Key suggestions to approach evaluation of gen AI systems
+September 2024 29 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Deploy 
+It should be clear by this point that production gen AI applications are complex systems with  many interacting components. Some of the common components discussed include multiple  prompts, models, adapter layers and external data sources. In deploying a gen AI system to  production, all these components need to be managed and coordinated with the previous  stages of gen AI system development. Given the novelty of these systems, best practices  for deployment and management are still evolving, but we can discuss observations and  recommendations for these components and indicate how to address the major concerns. 
+Deploying gen AI solutions necessarily involves multiple steps. For example, a single  application might utilize several large language models (LLMs) alongside a database, all  fed by a dynamic data pipeline. Each of these components potentially requires its own  deployment process. 
+For clarity, we distinguish between two main types of deployment: 
+1. Deployment of gen AI systems: This focuses on operationalizing a complete system  tailored for a specific use case. It encompasses deploying all the necessary elements  - the application, chosen LLMs, database, data pipelines, and any other relevant  components - to create a functioning end-user solution. 
+2. Deployment of foundational models: This applies to open-weight models, where the  model weights are publicly available on platforms like Vertex Model Garden or Hugging  Face, or privately trained models. Deployment in this scenario centers around making  the foundational model itself accessible to users. Given their multipurpose nature, these  deployments often aim to support various potential use cases.
+September 2024 30 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Deployment of gen AI systems 
+Deployment of gen AI systems is broadly similar to deployment of any other complex  software system. Most of the system components – databases, Python applications, etc. –  are also found in other non-gen AI applications. As a result, our general recommendation is  to manage these components using standard software engineering practices such as version  control17 and Continuous Integration / Continuous Delivery (CI/CD).18 
+Version control 
+Gen AI experimentation is an iterative process involving repeated cycles of development,  evaluation, and modification. To ensure a structured and manageable approach, it's crucial to  implement strict versioning for all modifiable components. These components include: 
+• Prompt templates: Unless leveraging specific prompt management solutions, version  them through standard version control tools like Git. 
+• Chain definitions: The code defining the chain (including API integrations, database calls,  functions, etc.) should also be versioned using tools like Git. This provides a clear history  and enables easy rollback if needed. 
+• External datasets: In retrieval augmented generation (RAG) systems, external datasets  play a key role. It’s important to track these changes and versions of these datasets for  reproducibility. You can do that by leveraging existing data analytics solutions such as  BigQuery, AlloyDB, Vertex Feature Store.  
+• Adapter models: The landscape of techniques like LoRA tuning for adapter models is  constantly evolving. . You can leverage established data storage solutions (e.g. cloud  storage) to manage and version these assets effectively.
+September 2024 31 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+Continuous integration of gen AI systems 
+In a continuous integration framework, every code change goes through automatic testing  before merging to catch issues early. Here, unit and integration testing are key for quality  and reliability. Unit tests act like a microscope, zooming in on individual code pieces, while  integration testing verifies that different components work together. 
+The benefits of continuous integration in traditional software development are well understood. Implementing a CI system helps to do the following: 
+1. Ensure reliable, high-quality outputs: Rigorous testing increases confidence in the  system's performance and consistency.  
+2. Catch bugs early: Identifying issues through testing prevents them from causing bigger  problems downstream. It also makes the system more robust and resilient to edge cases  and unexpected inputs. 
+3. Lower maintenance costs: Well-documented test cases simplify troubleshooting and  enable smoother modifications in the future, reducing overall maintenance efforts 
+These benefits are applicable to gen AI Systems as much as any software product.  Continuous Integration should be applied to all elements of the system, including the prompt  templates, the chain and chaining logic, and any embedding models and retrieval systems. 
+However, applying CI to gen AI comes with challenges: 
+1. Difficult to generate comprehensive test cases: The complex and open-ended nature of  gen AI outputs makes it hard to define and create an exhaustive set of test cases that  cover all possibilities.
+September 2024 32 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+2. Reproducibility issues: Achieving deterministic, reproducible results is tricky since  generative models often have intrinsic randomness and variability in their outputs, even for  identical inputs. This makes it harder to consistently test for specific expected behaviors. 
+These challenges are closely related to the broader question of how to evaluate gen AI  systems. Many of the same techniques discussed in the Evaluation section above can also  be applied to the development of CI systems for gen AI. This is an ongoing area of research,  however, and more techniques will undoubtedly emerge in the near future. 
+Continuous delivery of gen AI systems 
+Once the code is merged, a continuous delivery process begins to move the built and tested  code through environments that closely resemble production for further testing before the  final deployment.  
+As mentioned in the "'"Develop and Experiment"'" segment, chain elements become one  of the main components to deploy, as they fundamentally constitute the gen AI application  serving users. 
+The delivery process of the gen AI application containing the chain may vary depending on  the latency requirements and whether the use case is batch or online: 
+1. Batch use cases require deploying a batch process executed on a schedule in production.  The delivery process should focus on testing the entire pipeline in integration in an  environment close to production before deployment. As part of the testing process,  developers can assert specific requirements around the throughput of the batch process  itself and checking that all components of the application are functioning correctly (e.g.,  permissioning, infrastructure, code dependencies).
+September 2024 33 
+Operationalizing Generative AI on Vertex AI using ML Ops 
+2. Online use cases require deploying an API, in this case, the application containing the  chain, capable of responding to users at low latency. The delivery process should involve  testing the API in integration in an environment close to production, with tests to assert  that all components of the application are functioning correctly (e.g., permissioning,  infrastructure, code dependencies). Non-functional requirements (e.g., scalability,  reliability, performance) can be verified through a series of tests, including load tests. 
