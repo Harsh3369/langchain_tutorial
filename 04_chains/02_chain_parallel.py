@@ -62,3 +62,8 @@ chain = (
 #run the chain
 result = chain.invoke({"interview_profile": "ML Engineer", "num_of_years": 7})
 print(result)
+try:
+    result = chain.invoke({"interview_profile": "ML Engineer", "num_of_years": 7})
+    print(result)
+except Exception as e:
+    print(f"An error occurred: {e}")
