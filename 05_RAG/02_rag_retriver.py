@@ -21,7 +21,7 @@ query = "Explain foundation of LLMs?"
 
 # Retrieve relevant documents based on the query
 retriever = db.as_retriever(search_type = "similarity_score_threshold",
-                            search_kwargs = {"k": 3, "score_threshold": 0.8},
+                            search_kwargs = {"k": 3, "score_threshold": 0.4},
                             )
 relevant_docs = retriever.invoke(query)
 
