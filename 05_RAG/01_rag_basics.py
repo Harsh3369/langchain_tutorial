@@ -12,7 +12,7 @@ load_dotenv()
 current_dir = os.path.dirname(os.path.abspath(__file__))
 file_path = os.path.join(current_dir, "content_for_rag", "google_ai_engineer_notes.txt")
 
-persistent_directory = os.path.join(current_dir, "db", "faiss")
+persistent_directory = os.path.join(current_dir, "db", "chroma")
 
 # Check if the faiss vector store already exists
 if not os.path.exists(persistent_directory):
