@@ -27,6 +27,7 @@ transformers = "^4.47.0"
 ipykernel = "^6.29.5"
 pandas = "^2.2.3"
 pypdf2 = "^3.0.1"
+langchain-chroma = "^0.1.4"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md

@@ -1,5 +1,5 @@
 import os
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
 from dotenv import load_dotenv
@@ -17,16 +17,17 @@ db = Chroma(persist_directory= persistent_directory,
             embedding_function= embeddings)
 
 #define the query
-query = "Explain foundation of LLMs?"
+query = "What are embeddings models?"
 
 # Retrieve relevant documents based on the query
 retriever = db.as_retriever(search_type = "similarity_score_threshold",
-                            search_kwargs = {"k": 3, "score_threshold": 0.4},
+                            search_kwargs = {"k": 3, "score_threshold": 0.3},
                             )
 relevant_docs = retriever.invoke(query)
 
 # Display the relevant results with metadata
 print("\n--- Relevant Documents ---")
+print(f"Number of documents: {len(relevant_docs)}")
 for i, doc in enumerate(relevant_docs, 1):
     print(f"Document {i}:\n{doc.page_content}\n")
     if doc.metadata:

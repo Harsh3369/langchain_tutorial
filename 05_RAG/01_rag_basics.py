@@ -2,7 +2,7 @@ import os
 
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
-from langchain_community.vectorstores import Chroma, FAISS
+from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
 from dotenv import load_dotenv
@@ -29,7 +29,7 @@ if not os.path.exists(persistent_directory):
     documents = loader.load()
 
     #Split the documents into chunks
-    text_splitter = CharacterTextSplitter(chunk_size = 200, chunk_overlap=0)
+    text_splitter = CharacterTextSplitter(chunk_size = 100, chunk_overlap=0)
     docs = text_splitter.split_documents(documents)
 
     #Display informations about the the split documents
